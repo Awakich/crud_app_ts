@@ -1,25 +1,36 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, FC } from "react"
+import { QuizItem } from '../models'
+import QuizInfo from '../components/QuizInfo'
 
-const App = () => {
+const App: FC = () => {
 
-  const [isFlipped, setIsFlipped] = useState(false)
-  const [quizs, setQuizs] = useState<any>([])
+  const [quizs, setQuizs] = useState<QuizItem[]>([])
 
-  const handleClick = () => {
-    setIsFlipped(!isFlipped)
+  const fetchData = async () => {
+    const res = await fetch('https://opentdb.com/api.php?amount=20').then(res => res.json())
+    setQuizs(res.results)
   }
 
   useEffect(() => {
-    const res = fetch('https://opentdb.com/api.php?amount=16').then(res => res.json())
-    setQuizs(res)
-  })
-
-  console.log(quizs)
+    fetchData()
+  }, [])
 
   return (
-    <div>
-      <h1>1</h1>
-    </div>
+    <main className="pt-5 text-white">
+
+      <div className="space-y-4 text-center text-[#232323] mb-10">
+        <h1 className="text-8xl font-bold">QUIZ</h1>
+        <h4 className="font-light text-xl italic">Test your brain</h4>
+     </div>
+
+      <div className="grid grid-cols-4 gap-10 bg-[#232323] px-12 py-6 rounded-t-3xl">
+        {quizs.map(({ category, difficulty, question, correct_answer, incorrect_answers }, index) => (
+          <div key={index}>
+            <QuizInfo category={category} difficulty={difficulty} question={question} correct_answer={correct_answer} incorrect_answers={incorrect_answers} />
+          </div>
+        ))}
+      </div>
+    </main>
   )
 }
 
